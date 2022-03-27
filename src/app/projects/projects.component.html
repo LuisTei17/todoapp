@@ -1,1 +1,24 @@
-<p>projects works!</p>
+<section class="project">
+    <section class="container">
+        <div class="row row-cols-auto">
+            <div *ngFor="let project of projects; index as i" class="col project-card">
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <div class="card-text">
+                            <h5 *ngIf="!project.edit" class="card-title">{{ project.name }}</h5>
+                            <input class="card-form" *ngIf="project.edit" [(ngModel)]="project.name">
+                            <div *ngIf="!project.edit" class="card-actions">
+                                <i (click)="edit(project._id)" class="bi bi-pencil-square"></i>
+                                <i (click)="delete(project._id)" class="bi bi-trash"></i>
+                            </div>
+                            <div *ngIf="project.edit" class="card-actions">
+                                <i (click)="saveProject(project)" class="bi bi-check2"></i>
+                                <i (click)="cancelEdit()" class="bi bi-x-lg"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>

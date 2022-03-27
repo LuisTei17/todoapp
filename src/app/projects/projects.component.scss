@@ -1,0 +1,23 @@
+.project {
+    padding: 20px;
+}
+
+.project .project-card {
+    padding: 20px;
+}
+
+.project .card-text {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.project .card-actions i {
+    padding-left: 15px;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.project .card-form {
+    width: 70%;
+}

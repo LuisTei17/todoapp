@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiHttpService } from 'src/src/helpers/api';
+import { ApiHttpService } from 'src/helpers/api';
+import { StorageService } from 'src/helpers/storage';
 import { User } from '../models/user';
 
 @Component({
@@ -11,7 +12,11 @@ import { User } from '../models/user';
 export class LoginComponent {
   model: User;
 
-  constructor(private api: ApiHttpService, private router: Router) { 
+  constructor(
+    private api: ApiHttpService,
+    private router: Router,
+    private storage: StorageService) { 
+
     this.model = new User();
   }
 
@@ -23,7 +28,10 @@ export class LoginComponent {
   }
 
   savedUser(resp: any) {
-    console.log(resp)
+    if (!resp || !resp.token)
+      return;
+
+    this.storage.saveItem(resp.token);
     this.router.navigate(['projects']);
   }
 

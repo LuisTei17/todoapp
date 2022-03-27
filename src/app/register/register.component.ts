@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiHttpService } from 'src/src/helpers/api';
+import { ApiHttpService } from 'src/helpers/api';
 import { User } from '../models/user';
 
 @Component({
