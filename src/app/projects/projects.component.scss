@@ -1,3 +1,5 @@
+@import '../../styles';
+
 .project {
     padding: 20px;
 }
@@ -7,17 +9,49 @@
 }
 
 .project .card-text {
-    display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
 .project .card-actions i {
     padding-left: 15px;
-    font-size: 22px;
+    font-size: 20px;
     cursor: pointer;
 }
 
 .project .card-form {
     width: 70%;
 }
+
+.tasks {
+    display: flex;
+    justify-content: space-between;
+}
+
+.add-task-btn {
+    width: 70px;
+    margin-left: 6px;
+}
+
+.task-list {
+    max-height: 300px;
+    overflow: auto;
+}
+
+.add-project-card {
+    margin: auto;
+    width: 60%;
+}
+
+.add-project-btn {
+    position: fixed;
+    top: 80%;
+    left: 70%;
+}
+
+
+.add-project-btn i {
+    color: $buttonColor;
+    font-size: 50px;
+}
+

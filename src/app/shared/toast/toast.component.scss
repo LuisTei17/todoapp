@@ -1,0 +1,18 @@
+@import '../../../styles';
+
+.toast-alert {
+    position: fixed;
+    z-index: 10;
+    bottom: 88%;
+    left: 80%;
+}
+
+.toast-alert-error {
+    background-color: $errorToast;
+    color: white;
+
+}
+
+.toast-alert-success {
+    background-color: $successToast;
+}

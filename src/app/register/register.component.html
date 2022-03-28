@@ -1,19 +1,21 @@
 
 <section class="register-form">
-    <h1 class="display-6">Registro de usuário</h1>
+    <h1 class="display-6">{{'USER_REGISTRATION' | translate}}</h1>
     <form>
         <div class="mb-3">
-            <label for="name" class="form-label">Nome</label>
+            <label for="name" class="form-label">{{'NAME' | translate}}</label>
             <input type="text" name="name" [(ngModel)]="model.name" class="form-control" id="name" aria-describedby="nameHelp" required>
         </div>
         <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
+            <label for="email" class="form-label">{{'EMAIL' | translate}}</label>
             <input type="email" name="email" [(ngModel)]="model.email" class="form-control" id="email" aria-describedby="emailHelp" required>
         </div>
         <div class="mb-3">
-            <label for="password" class="form-label">Senha</label>
+            <label for="password" class="form-label">{{'PASSWORD' | translate}}</label>
             <input type="password" name="password" [(ngModel)]="model.password" class="form-control" id="password" required>
         </div>
-        <button (click)="onSave()" class="btn btn-primary">Enviar</button>
+        <button (click)="onSave()" class="btn btn-colored">{{'SIGNUP' | translate}}</button>
     </form>
+    <app-spinner></app-spinner>
+    <app-toast text="{{message | translate}}" type="{{type}}" [show]="show" (onShowChange)="show=false" aria-live="polite" aria-atomic="true"></app-toast>
 </section>

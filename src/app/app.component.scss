@@ -1,4 +1,10 @@
+@import '../styles';
+
 .app {
-    background-color: dodgerblue;
+    background-color: $backgroundColor;
     height: 100%;
+}
+
+.menu-item {
+    cursor: pointer;
 }

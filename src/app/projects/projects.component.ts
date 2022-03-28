@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { ApiHttpService } from 'src/helpers/api';
-import { Project } from '../models/project';
+import { Router } from '@angular/router';
+import { ApiHttpService } from 'src/helpers/api.service';
+import { NewProject, Project } from '../models/project';
+import { Task } from '../models/task';
+import { SpinnerComponent } from '../shared/spinner/spinner.component';
 
 @Component({
   selector: 'app-projects',
@@ -8,59 +11,149 @@ import { Project } from '../models/project';
   styleUrls: ['./projects.component.scss']
 })
 export class ProjectsComponent implements OnInit {
-  projects: Array<Project> = []
-  constructor(private api: ApiHttpService) { }
+  projects: Array<Project> = [];
+  newProject: NewProject = {name: ''};
+  message: string = '';
+  type: string = '';
+  show: boolean = false;
+
+
+  constructor(private api: ApiHttpService, private route: Router, private spinnerService: SpinnerComponent) { }
 
   ngOnInit(): void {
     this.retrieveProjects();
   }
 
+  checkTaskForm(model: Task) {
+    if (!model.description) {
+      this.showMessage('Descrição da tarefa não informada', 'error');
+      return;
+    }
+    return true;
+  }
+
+  checkProjectForm(model: NewProject) {
+    if (!model.name) {
+      this.showMessage('Titulo do projeto não informado', 'error');
+      return;
+    }
+    return true;
+  }
+
+
   retrieveProjects() {
+    this.spinnerService.show();
     this.api.get('project').subscribe({
       next: this.retrievedProjects.bind(this),
-      error: this.invalidProjectCall.bind(this)
+      error: this.invalidCall.bind(this)
     })
   }
 
-  retrievedProjects(data: any) {
-    this.projects = data;
+  fitTextInContent(text: string, MAX_LETTERS: number) {
+      return `${text.slice(0, MAX_LETTERS)}...`;
   }
 
-  delete(id: string) {
-    this.api.delete('project/' + id).subscribe({
-      next: this.projectUpdated.bind(this),
-      error: this.invalidProjectCall.bind(this)
+  retrievedProjects(projects: any) {
+    const MAX_LETTERS = 18;
+
+    projects.forEach((project: Project)  => {
+      project.newTask = {description: ''};
+      project.tasks = project.tasks?.map((task) => {
+        task.label = task.description;
+        if (task.description.length > MAX_LETTERS)
+          task.label = this.fitTextInContent(task.description, MAX_LETTERS);
+        return task;
+      })
+      project.finishedTasks = project.tasks?.filter((task: Task) => task.finished);
+      project.tasks = project.tasks?.filter((task: Task) => !task.finished);
+    });
+    this.projects = projects;
+    this.spinnerService.hide();
+  }
+
+  delete(task: Task) {
+    if (task.finished)
+      return;
+    this.spinnerService.show();
+    this.api.delete('tasks/' + task._id).subscribe({
+      next: this.itemUpdated.bind(this),
+      error: this.invalidCall.bind(this)
     })
   }  
 
-  saveProject(project: Project) {
-    this.api.put('project/' + project._id, {name: project.name}).subscribe({
-      next: this.projectUpdated.bind(this),
-      error: this.invalidProjectCall.bind(this)
+  saveTask(task: Task) {
+    this.spinnerService.show();
+    this.api.put('tasks/' + task._id, {description: task.newDescription}).subscribe({
+      next: this.itemUpdated.bind(this),
+      error: this.invalidCall.bind(this)
     })
   }
 
-  cancelEdit() {
-    this.projects.forEach(project => {
-      project.edit = false;
+  checkTask(task: Task) {
+    task.finished = !task.finished;
+    this.spinnerService.show();
+    this.api.put('tasks/' + task._id, {finished: task.finished}).subscribe({
+      next: this.itemUpdated.bind(this),
+      error: this.invalidCall.bind(this)
     })
   }
 
-  edit(id: string) {
-    this.projects.forEach(project => {
-      project.edit = false;
-      if (project._id === id)
-        project.edit = true;
+  toggleEdit(task: Task) {
+    if (task.finished)
+      return;
+    task.edit = !task.edit;
+    task.newDescription = task.description;
+  }
+
+  addTask(project: Project, $event: any) {
+    $event.stopPropagation();
+
+    const newTask = project.newTask;
+    if (!newTask)
+      return;
+
+    const valid = this.checkTaskForm(newTask);
+
+    if (!valid)
+      return;
+    newTask.id_project = project._id;
+    project.newTask = {description: ''}
+
+    this.spinnerService.show();
+    this.api.post('tasks', newTask).subscribe({
+      next: this.itemUpdated.bind(this),
+      error: this.invalidCall.bind(this)
     })
   }
 
-  projectUpdated() {
+  addProject(newProject: NewProject) {
+    const valid = this.checkProjectForm(newProject);
+
+    if (!valid)
+      return;
+
+    this.spinnerService.show();
+    this.api.post('project', {name: newProject.name}).subscribe({
+      next: this.itemUpdated.bind(this),
+      error: this.invalidCall.bind(this)
+    })
+  }
+
+  itemUpdated() {
     console.log('Ação realizada com sucesso');
+    this.spinnerService.hide();
     this.retrieveProjects();
   }
 
-  invalidProjectCall(error: any) {
-    console.log(error)
+  invalidCall(error: string) {
+    this.showMessage(error, 'error')
+    this.spinnerService.hide();
+    console.log(error);
   }
 
+  showMessage(message: string, type: string) {
+    this.message = message;
+    this.type = type;
+    this.show = true;
+  }
 }

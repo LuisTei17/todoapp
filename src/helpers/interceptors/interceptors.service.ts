@@ -3,15 +3,16 @@ import {
   HttpEvent,
   HttpInterceptor,
   HttpHandler,
-  HttpRequest }
+  HttpRequest, 
+  HttpErrorResponse}
 from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { StorageService } from '../storage';
+import { catchError, Observable, throwError } from 'rxjs';
+import { StorageService } from '../storage.service';
 @Injectable()
 export class Interceptor implements HttpInterceptor {
     constructor(private storageService : StorageService) {}
     intercept( request: HttpRequest<any>, next: HttpHandler ): Observable<HttpEvent<any>> {
-        const token = this.storageService.retrieveItem();
+        const token = this.storageService.retrieveToken();
         if (token) {
             request = request.clone({
                 setHeaders: {
@@ -19,6 +20,18 @@ export class Interceptor implements HttpInterceptor {
                 }
             })
         }
-        return next.handle(request);
+        return next.handle(request)
+        .pipe(
+            catchError((response: HttpErrorResponse) => {
+                const FORBIDDEN_CODE = 403;
+              if (response.status === FORBIDDEN_CODE)
+                this.storageService.removeToken();
+              return throwError(() => response.error.message);
+            })
+          );
     }
+}
+
+function $q(arg0: () => null) {
+    throw new Error('Function not implemented.');
 }

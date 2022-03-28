@@ -27,3 +27,13 @@
 @import "../node_modules/bootstrap/scss/utilities/api";
 /* You can add global styles to this file, and also import other style files */
 @import "~bootstrap-icons/font/bootstrap-icons.css";
+
+$backgroundColor: #118ed6;
+$buttonColor: #11d659;
+$errorToast: rgb(184, 69, 69);
+$successToast: #11d659;
+
+.btn-colored {
+    background-color: $buttonColor;
+    color: black;
+}

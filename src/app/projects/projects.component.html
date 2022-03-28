@@ -5,20 +5,92 @@
                 <div class="card" style="width: 18rem;">
                     <div class="card-body">
                         <div class="card-text">
-                            <h5 *ngIf="!project.edit" class="card-title">{{ project.name }}</h5>
-                            <input class="card-form" *ngIf="project.edit" [(ngModel)]="project.name">
-                            <div *ngIf="!project.edit" class="card-actions">
-                                <i (click)="edit(project._id)" class="bi bi-pencil-square"></i>
-                                <i (click)="delete(project._id)" class="bi bi-trash"></i>
-                            </div>
-                            <div *ngIf="project.edit" class="card-actions">
-                                <i (click)="saveProject(project)" class="bi bi-check2"></i>
-                                <i (click)="cancelEdit()" class="bi bi-x-lg"></i>
-                            </div>
+                            <h3 *ngIf="!project.edit" class="card-title">{{ project.name }}</h3>
+                            <section class="task-list">
+                                <h5 *ngIf="project.tasks.length">{{'TASKS' | translate }}</h5>
+                                <div class="tasks" *ngFor="let task of project.tasks; index as j">
+                                    <p  
+                                      (click)="toggleEdit(task)"
+                                      *ngIf="!task.edit"
+                                      class="card-title"
+                                      data-bs-toggle="tooltip" data-bs-placement="top" title="{{task.description}}"
+                                    >
+                                        {{ task.label }}
+                                    </p>
+                                    <input class="card-form" *ngIf="task.edit" value="task.description" [(ngModel)]="task.newDescription">
+                                    <div *ngIf="!task.edit" class="card-actions">
+                                        <i (click)="delete(task)" class="bi bi-trash"></i>
+                                        <i (click)="checkTask(task)" class="bi bi-check-square"></i>
+                                    </div>
+                                    <div *ngIf="task.edit" class="card-actions">
+                                        <i (click)="saveTask(task)" class="bi bi-check2"></i>
+                                        <i (click)="toggleEdit(task)" class="bi bi-x-lg"></i>
+                                    </div>
+                                </div>
+
+                                <hr *ngIf="project.finishedTasks.length && project.tasks.length">
+
+                                <h5 *ngIf="project.finishedTasks.length">{{'FINISHED' | translate}}</h5>
+                                <div class="tasks" *ngFor="let task of project.finishedTasks; index as j">
+                                  <p  
+                                    data-bs-toggle="tooltip" data-bs-placement="top" title="{{task.finishDate |  date:'dd/MM/YYYY'}}"
+                                    [style.text-decoration]="'line-through'" 
+                                    (click)="toggleEdit(task)"
+                                    *ngIf="!task.edit"
+                                    class="card-title"
+                                  >
+                                      {{ task.description }}
+                                  </p>
+                                  <input class="card-form" *ngIf="task.edit" value="task.description" [(ngModel)]="task.newDescription">
+                                  <div *ngIf="!task.edit" class="card-actions">
+                                      <i (click)="checkTask(task)" class="bi bi-square"></i>
+                                  </div>
+                                  <div *ngIf="task.edit" class="card-actions">
+                                      <i (click)="saveTask(task)" class="bi bi-check2"></i>
+                                      <i (click)="toggleEdit(task)" class="bi bi-x-lg"></i>
+                                  </div>
+                              </div>
+                            </section>
+                            <hr>
+                            <section class="add-task">
+                                <input placeholder="{{'TASK_DESCRIPTION' | translate}}" class="card-form" [(ngModel)]="project.newTask.description">
+                                <button (click)="addTask(project, $event)" class="add-task-btn btn btn-colored">{{'SAVE' | translate}}</button>
+                            </section>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+    <ngx-spinner
+    bdColor="rgba(51,51,51,0.8)"
+    size="medium"
+    color="#fff"
+    type="ball-scale-multiple"
+  >
+    <p style="font-size: 20px; color: white">{{'LOADING' | translate }}...</p>
+  </ngx-spinner>
+  <app-toast text="{{message}}" type="{{type}}" [show]="show" (onShowChange)="show=false" aria-live="polite" aria-atomic="true"></app-toast>
+
 </section>
+
+<a class="btn add-project-btn" data-bs-toggle="modal" data-bs-target="#projectModal">
+  <i class="bi bi-plus-circle-fill"></i>
+</a>
+  
+  <div class="modal fade" id="projectModal" tabindex="-1" aria-labelledby="projectLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="projectLabel">{{'ADD_PROJECT' | translate}}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <input placeholder="{{'PROJECT_NAME' | translate}}" class="card-form" [(ngModel)]="newProject.name">
+        </div>
+        <div class="modal-footer">
+          <button (click)="addProject(newProject)" data-bs-toggle="modal" type="button" class="btn btn-colored">{{'ADD' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
