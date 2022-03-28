@@ -4,10 +4,12 @@ export class Project {
     name: string = "";
     edit: boolean = false;
     tasks: Array<Task> = [];
+    newName: string = "";
     newTask: Task = {
         description: "",
     };
-    finishedTasks: Array<Task> = []
+    finishedTasks: Array<Task> = [];
+    label: string = "";
 }
 
 export class NewProject {

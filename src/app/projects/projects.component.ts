@@ -54,21 +54,45 @@ export class ProjectsComponent implements OnInit {
   }
 
   retrievedProjects(projects: any) {
-    const MAX_LETTERS = 18;
+    const TASK_MAX_LETTERS = 18;
+    const PROJECT_MAX_LETTERS = 12;
 
     projects.forEach((project: Project)  => {
+      project.label = project.name;
+      if (project.name.length > PROJECT_MAX_LETTERS)
+        project.label = this.fitTextInContent(project.name, PROJECT_MAX_LETTERS);
+
       project.newTask = {description: ''};
+
       project.tasks = project.tasks?.map((task) => {
         task.label = task.description;
-        if (task.description.length > MAX_LETTERS)
-          task.label = this.fitTextInContent(task.description, MAX_LETTERS);
-        return task;
+
+        if (task.description.length > TASK_MAX_LETTERS)
+          task.label = this.fitTextInContent(task.description, TASK_MAX_LETTERS);
+
+          return task;
       })
       project.finishedTasks = project.tasks?.filter((task: Task) => task.finished);
       project.tasks = project.tasks?.filter((task: Task) => !task.finished);
     });
     this.projects = projects;
     this.spinnerService.hide();
+  }
+
+  deleteProject(project: Project) {
+    this.spinnerService.show();
+    this.api.delete('project/' + project._id).subscribe({
+      next: this.itemUpdated.bind(this),
+      error: this.invalidCall.bind(this)
+    })
+  }  
+
+  saveProject(project: Project) {
+    this.spinnerService.show();
+    this.api.put('project/' + project._id, {name: project.newName}).subscribe({
+      next: this.itemUpdated.bind(this),
+      error: this.invalidCall.bind(this)
+    })
   }
 
   delete(task: Task) {
@@ -98,7 +122,12 @@ export class ProjectsComponent implements OnInit {
     })
   }
 
-  toggleEdit(task: Task) {
+  toggleEditProject(project: Project) {
+    project.edit = !project.edit;
+    project.newName = project.name;
+  }
+
+  toggleEditTask(task: Task) {
     if (task.finished)
       return;
     task.edit = !task.edit;

@@ -5,12 +5,29 @@
                 <div class="card" style="width: 18rem;">
                     <div class="card-body">
                         <div class="card-text">
-                            <h3 *ngIf="!project.edit" class="card-title">{{ project.name }}</h3>
+                            <div class="project-title">
+                              <h3 
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="{{project.name}}"
+                                (click)="toggleEditProject(project)"
+                                *ngIf="!project.edit"
+                                class="card-title"
+                              >
+                                {{ project.label }}
+                              </h3>
+                              <input class="card-form" *ngIf="project.edit" value="task.description" [(ngModel)]="project.newName">
+                              <div *ngIf="!project.edit" class="card-actions">
+                                <i (click)="deleteProject(project)" class="bi bi-trash"></i>
+                              </div>
+                              <div *ngIf="project.edit" class="card-actions">
+                                <i (click)="saveProject(project)" class="bi bi-check2"></i>
+                                <i (click)="toggleEditProject(project)" class="bi bi-x-lg"></i>
+                              </div>
+                            </div>
                             <section class="task-list">
                                 <h5 *ngIf="project.tasks.length">{{'TASKS' | translate }}</h5>
                                 <div class="tasks" *ngFor="let task of project.tasks; index as j">
                                     <p  
-                                      (click)="toggleEdit(task)"
+                                      (click)="toggleEditTask(task)"
                                       *ngIf="!task.edit"
                                       class="card-title"
                                       data-bs-toggle="tooltip" data-bs-placement="top" title="{{task.description}}"
@@ -24,7 +41,7 @@
                                     </div>
                                     <div *ngIf="task.edit" class="card-actions">
                                         <i (click)="saveTask(task)" class="bi bi-check2"></i>
-                                        <i (click)="toggleEdit(task)" class="bi bi-x-lg"></i>
+                                        <i (click)="toggleEditTask(task)" class="bi bi-x-lg"></i>
                                     </div>
                                 </div>
 
@@ -35,7 +52,7 @@
                                   <p  
                                     data-bs-toggle="tooltip" data-bs-placement="top" title="{{task.finishDate |  date:'dd/MM/YYYY'}}"
                                     [style.text-decoration]="'line-through'" 
-                                    (click)="toggleEdit(task)"
+                                    (click)="toggleEditTask(task)"
                                     *ngIf="!task.edit"
                                     class="card-title"
                                   >
@@ -47,7 +64,7 @@
                                   </div>
                                   <div *ngIf="task.edit" class="card-actions">
                                       <i (click)="saveTask(task)" class="bi bi-check2"></i>
-                                      <i (click)="toggleEdit(task)" class="bi bi-x-lg"></i>
+                                      <i (click)="toggleEditTask(task)" class="bi bi-x-lg"></i>
                                   </div>
                               </div>
                             </section>
@@ -70,7 +87,7 @@
   >
     <p style="font-size: 20px; color: white">{{'LOADING' | translate }}...</p>
   </ngx-spinner>
-  <app-toast text="{{message}}" type="{{type}}" [show]="show" (onShowChange)="show=false" aria-live="polite" aria-atomic="true"></app-toast>
+  <app-toast text="{{message | translate}}" type="{{type}}" [show]="show" (onShowChange)="show=false" aria-live="polite" aria-atomic="true"></app-toast>
 
 </section>
 
